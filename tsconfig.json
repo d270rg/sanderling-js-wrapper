@@ -1,0 +1,18 @@
+{
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
+  "include": ["./src","./src/**/*"],
+  "compilerOptions": {
+    "module": "NodeNext",
+    "paths": {
+      "@read-interface/*": ["./src/read-interface/*"],
+      "@plugins/*": ["./src/plugins/*"],
+      "@read-interface": ["./src/read-interface"],
+      "@plugins": ["./src/plugins"]
+    },
+    "baseUrl": "."
+  }
+}

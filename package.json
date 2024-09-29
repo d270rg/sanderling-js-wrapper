@@ -1,0 +1,19 @@
+{
+  "name": "sanderling-js-wrapper",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node -r tsconfig-paths/register ./src/index.ts"
+  },
+  "author": "d270rg",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@inquirer/prompts": "^6.0.1",
+    "set-interval-async": "^3.0.3",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "tsconfig-paths": "^4.2.0"
+  }
+}
