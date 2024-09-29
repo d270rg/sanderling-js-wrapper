@@ -81,7 +81,7 @@ export function checkForNotEmptySearchUIRootAddressCompleted(
   response: SearchUIRootAddressCompletedResponse<any>
 ): response is SearchUIRootAddressCompletedResponse<UIRootAddressCompletedResponse> {
   if (
-    response.SearchUIRootAddressResponse.stage?.SearchUIRootAddressCompleted[
+    response.SearchUIRootAddressResponse.stage?.SearchUIRootAddressCompleted!== undefined && response.SearchUIRootAddressResponse.stage.SearchUIRootAddressCompleted[
       "uiRootAddress"
     ] !== undefined
   ) {

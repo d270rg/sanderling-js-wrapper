@@ -49,7 +49,7 @@ export class SignatureWatch implements DefaultPlugin {
       );
 
       if (start < 0 || end < 0) {
-        throw new Error(
+        console.log(
           "Agency window is closed, please keep agency window open"
         );
       }
