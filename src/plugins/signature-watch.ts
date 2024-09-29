@@ -1,5 +1,5 @@
 import { setIntervalAsync } from "set-interval-async";
-import { getMemoryReadResult } from "@read-interface/index";
+import { connectToClient, getMemoryReadResult } from "@read-interface/index";
 import { DefaultPlugin } from "./default-plugin";
 
 interface ISigResult {
@@ -34,24 +34,24 @@ export class SignatureWatch implements DefaultPlugin {
   }
 
   public getDescription(): string {
-    return "Reads signatures from open Agency window and tracks their changes"
+    return "Reads signatures from open Agency window and tracks their changes";
   }
 
   public async execute(): Promise<void> {
-    console.log("Scan active!");
+    console.log("Activating scan...");
+    const gameClientData = await connectToClient();
+    console.log("Received game client data, scan is now active!");
     let previousResult: ISigResult = {};
     setIntervalAsync(async () => {
-      const windowText = await getMemoryReadResult(true);
+      const windowText = await getMemoryReadResult(gameClientData, true);
       const start =
         windowText.findIndex((text) => text === "Showing 30 results") + 1;
       const end = windowText.findIndex(
         (text) => text === "Signatures in system"
       );
-
       if (start < 0 || end < 0) {
-        console.log(
-          "Agency window is closed, please keep agency window open"
-        );
+        console.log("Agency window is closed, please keep agency window open");
+        return;
       }
 
       let result: ISigResult = {};

@@ -109,7 +109,9 @@ async function readFromWindow(
 
     const data =
       (await response.json()) as RunInVolatileProcessCompleteResponse<string>;
-    return parseRunInVolatileProcessCompleteResponse<ReadFromWindowResult | string[]>(data);
+    return parseRunInVolatileProcessCompleteResponse<
+      ReadFromWindowResult | string[]
+    >(data);
   } catch (error) {
     console.error(error);
   }
@@ -145,6 +147,10 @@ async function waitForGameClientProcess(): Promise<ListGameClientProcessesRespon
           reject(new Error("No game client found"));
         }
         clearIntervalAsync(interval);
+        console.log(
+          "Game client process found",
+          result.ListGameClientProcessesResponse[0].processId
+        );
         resolve(result);
       }
     }, 1000);
@@ -181,11 +187,12 @@ async function waitForUIRootAddress(processId: number): Promise<string> {
         );
       }
       if (result !== undefined) {
-        clearIntervalAsync(interval);
-        resolve(
+        const uiRootAddress =
           result.SearchUIRootAddressResponse.stage.SearchUIRootAddressCompleted
-            .uiRootAddress
-        );
+            .uiRootAddress;
+        console.log("Found UI Root adress", uiRootAddress);
+        clearIntervalAsync(interval);
+        resolve(uiRootAddress);
       }
     }, 1000);
   });
@@ -194,19 +201,36 @@ async function waitForUIRootAddress(processId: number): Promise<string> {
 }
 
 // --------------------- Workload ---------------------------
-export async function getMemoryReadResult(parseText:false):Promise<ReadFromWindowResult>
-export async function getMemoryReadResult(parseText:true):Promise<string[]>
-export async function getMemoryReadResult(parseText:boolean):Promise<string[] | ReadFromWindowResult> {
-  const gameClientData = await waitForGameClientProcess();
+export * from "./interfaces";
+export interface ClientConnectionInfo {
+  processData: ListGameClientProcessesResponse;
+  uiRootAddress: string;
+}
+
+export async function connectToClient(): Promise<ClientConnectionInfo> {
+  const processData = await waitForGameClientProcess();
 
   const uiRootAddress = await waitForUIRootAddress(
-    gameClientData.ListGameClientProcessesResponse[0].processId
+    processData.ListGameClientProcessesResponse[0].processId
   );
+  return { processData, uiRootAddress };
+}
 
+export async function getMemoryReadResult(
+  gameClientData: ClientConnectionInfo,
+  parseText: false
+): Promise<ReadFromWindowResult>;
+export async function getMemoryReadResult(
+  gameClientData: ClientConnectionInfo,
+  parseText: true
+): Promise<string[]>;
+export async function getMemoryReadResult(
+  gameClientData: ClientConnectionInfo,
+  parseText: boolean
+): Promise<string[] | ReadFromWindowResult> {
   return readFromWindow(
-    gameClientData.ListGameClientProcessesResponse[0].mainWindowId,
-    uiRootAddress,
+    gameClientData.processData.ListGameClientProcessesResponse[0].mainWindowId,
+    gameClientData.uiRootAddress,
     parseText as unknown as any //handled by overload
   );
 }
-export * from './interfaces';
