@@ -122,14 +122,19 @@ async function readFromWindow(
 async function checkForGameClientProcess(): Promise<
   ListGameClientProcessesResponse | undefined
 > {
-  const result = await listGameClientProcessesRequest();
-  if (!result) {
-    throw new Error("Initial request failed");
-  }
-  if (!checkForSetupNotCompletedResponse(result)) {
-    return result;
-  }
+  return new Promise((resolve, _) => {
+    const interval = setIntervalAsync(async () => {
+      console.log('Looking for game client process...');
+      const result = await listGameClientProcessesRequest();
+      if (result && !checkForSetupNotCompletedResponse(result)) {
+        console.log('Game client process response received');
+        clearIntervalAsync(interval);
+        resolve(result);
+      }
+    }, 1000);
+  });
 }
+
 async function waitForGameClientProcess(): Promise<ListGameClientProcessesResponse> {
   const p = new Promise<ListGameClientProcessesResponse>((resolve, reject) => {
     let checkIterations = 0;

@@ -59,7 +59,11 @@ export interface ReadFromWindowResult {
 
 export function parseRunInVolatileProcessCompleteResponse<T>(
   rawResponse: RunInVolatileProcessCompleteResponse<string>
-): T {
+): T | undefined {
+  if (rawResponse.RunInVolatileProcessCompleteResponse === undefined) {
+    console.log("Empty RunInVolatileCompleteResponse");
+    return undefined;
+  }
   const responseValue =
     rawResponse.RunInVolatileProcessCompleteResponse[0].returnValueToString
       .Just[0];
@@ -81,7 +85,9 @@ export function checkForNotEmptySearchUIRootAddressCompleted(
   response: SearchUIRootAddressCompletedResponse<any>
 ): response is SearchUIRootAddressCompletedResponse<UIRootAddressCompletedResponse> {
   if (
-    response.SearchUIRootAddressResponse.stage?.SearchUIRootAddressCompleted!== undefined && response.SearchUIRootAddressResponse.stage.SearchUIRootAddressCompleted[
+    response.SearchUIRootAddressResponse.stage?.SearchUIRootAddressCompleted !==
+      undefined &&
+    response.SearchUIRootAddressResponse.stage.SearchUIRootAddressCompleted[
       "uiRootAddress"
     ] !== undefined
   ) {
